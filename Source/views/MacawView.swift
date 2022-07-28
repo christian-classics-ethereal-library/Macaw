@@ -302,6 +302,10 @@ internal class DrawingView: MView {
         super.init(frame: frame)
     }
 
+    deinit {
+        renderer?.dispose()
+    }
+
     open override func layoutSubviews() {
         super.layoutSubviews()
         setNeedsDisplay()
