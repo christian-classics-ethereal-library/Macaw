@@ -96,6 +96,7 @@ open class SVGParser {
                                     "stop-opacity",
                                     "font-family",
                                     "font-size",
+                                    "font-style",
                                     "font-weight",
                                     "text-anchor",
                                     "visibility",
@@ -409,6 +410,7 @@ open class SVGParser {
                              opacity: getOpacity(style),
                              fontName: getFontName(style),
                              fontSize: getFontSize(style),
+                             fontStyle: getFontStyle(style),
                              fontWeight: getFontWeight(style),
                              pos: position)
         case "use":
@@ -1039,6 +1041,7 @@ open class SVGParser {
                                opacity: Double,
                                fontName: String?,
                                fontSize: Int?,
+                               fontStyle: String?,
                                fontWeight: String?,
                                pos: Transform = Transform()) -> Node? {
         guard let element = text.element else {
@@ -1052,6 +1055,7 @@ open class SVGParser {
                                    opacity: opacity,
                                    fontName: fontName,
                                    fontSize: fontSize,
+                                   fontStyle: fontStyle,
                                    fontWeight: fontWeight,
                                    pos: pos)
         } else {
@@ -1064,6 +1068,7 @@ open class SVGParser {
                                                 opacity: opacity,
                                                 fontName: fontName,
                                                 fontSize: fontSize,
+                                                fontStyle: fontStyle,
                                                 fontWeight: fontWeight,
                                                 bounds: rect)
             return Group(contents: collectedTspans, place: pos, tag: getTag(element))
@@ -1088,6 +1093,7 @@ open class SVGParser {
                                      opacity: Double,
                                      fontName: String?,
                                      fontSize: Int?,
+                                     fontStyle: String?,
                                      fontWeight: String?,
                                      pos: Transform = Transform()) -> Text? {
         let string = text.text
@@ -1095,7 +1101,7 @@ open class SVGParser {
                                 dy: getDoubleValue(text, attribute: "y") ?? 0)
 
         return Text(text: string,
-                    font: getFont(fontName: fontName, fontWeight: fontWeight, fontSize: fontSize),
+                    font: getFont(fontName: fontName, fontWeight: fontWeight, fontSize: fontSize, fontStyle: fontStyle),
                     fill: fill,
                     stroke: stroke,
                     align: anchorToAlign(textAnchor),
@@ -1114,6 +1120,7 @@ open class SVGParser {
                                    opacity: Double,
                                    fontName: String?,
                                    fontSize: Int?,
+                                   fontStyle: String?,
                                    fontWeight: String?,
                                    bounds: Rect) -> [Node] {
         var collection: [Node] = []
@@ -1149,7 +1156,7 @@ open class SVGParser {
                 let place = Transform().move(dx: bounds.x + bounds.w, dy: bounds.y)
 
                 text = Text(text: trimmedString,
-                            font: getFont(fontName: fontName, fontWeight: fontWeight, fontSize: fontSize),
+                            font: getFont(fontName: fontName, fontWeight: fontWeight, fontSize: fontSize, fontStyle: fontStyle),
                             fill: fill,
                             stroke: stroke,
                             align: anchorToAlign(textAnchor),
@@ -1168,6 +1175,7 @@ open class SVGParser {
                                   opacity: opacity,
                                   fontName: fontName,
                                   fontSize: fontSize,
+                                  fontStyle: fontStyle,
                                   fontWeight: fontWeight,
                                   bounds: bounds,
                                   previousCollectedTspan: collection.last)
@@ -1195,6 +1203,7 @@ open class SVGParser {
                                 opacity: Double,
                                 fontName: String?,
                                 fontSize: Int?,
+                                fontStyle: String?,
                                 fontWeight: String?,
                                 bounds: Rect,
                                 previousCollectedTspan: Node?) -> Text? {
@@ -1222,7 +1231,7 @@ open class SVGParser {
         }
 
         return Text(text: text,
-                    font: getFont(attributes, fontName: fontName, fontWeight: fontWeight, fontSize: fontSize),
+                    font: getFont(attributes, fontName: fontName, fontWeight: fontWeight, fontSize: fontSize, fontStyle: fontStyle),
                     fill: fillColor,
                     stroke: stroke ?? getStroke(attributes),
                     align: anchorToAlign(textAnchor ?? getTextAnchor(attributes)),
@@ -1235,10 +1244,12 @@ open class SVGParser {
     fileprivate func getFont(_ attributes: [String: String] = [:],
                              fontName: String?,
                              fontWeight: String?,
-                             fontSize: Int?) -> Font {
+                             fontSize: Int?,
+                             fontStyle: String?) -> Font {
         return Font(
             name: getFontName(attributes) ?? fontName ?? "Serif",
             size: getFontSize(attributes) ?? fontSize ?? 12,
+            style: getFontStyle(attributes) ?? fontStyle ?? "normal",
             weight: getFontWeight(attributes) ?? fontWeight ?? "normal")
     }
 
@@ -1736,14 +1747,11 @@ open class SVGParser {
         return Int(round(size))
     }
 
-    fileprivate func getFontStyle(_ attributes: [String: String], style: String) -> Bool? {
+    fileprivate func getFontStyle(_ attributes: [String: String]) -> String? {
         guard let fontStyle = attributes["font-style"] else {
             return .none
         }
-        if fontStyle.lowercased() == style {
-            return true
-        }
-        return false
+        return fontStyle
     }
 
     fileprivate func getFontWeight(_ attributes: [String: String]) -> String? {

@@ -72,7 +72,7 @@ open class Text: Node {
         let font: MFont
         if let f = self.font {
 
-            if let customFont = RenderUtils.loadFont(name: f.name, size: f.size, weight: f.weight) {
+            if let customFont = RenderUtils.loadFont(name: f.name, size: f.size, style: f.style, weight: f.weight) {
                 font = customFont
             } else {
                 font = MFont.systemFont(ofSize: CGFloat(f.size), weight: getWeight(f.weight))

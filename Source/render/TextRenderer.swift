@@ -92,7 +92,7 @@ class TextRenderer: NodeRenderer {
             return MFont.systemFont(ofSize: MFont.mSystemFontSize)
         }
 
-        if let customFont = RenderUtils.loadFont(name: textFont.name, size: textFont.size, weight: textFont.weight) {
+        if let customFont = RenderUtils.loadFont(name: textFont.name, size: textFont.size, style: textFont.style, weight: textFont.weight) {
             return customFont
         } else {
             if let weight = getWeight(textFont.weight) {

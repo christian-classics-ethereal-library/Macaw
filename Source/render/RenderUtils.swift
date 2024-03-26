@@ -46,7 +46,7 @@ class RenderUtils {
         return result
     }
 
-    class func loadFont(name: String, size: Int, weight: String?) -> MFont? {
+    class func loadFont(name: String, size: Int, style: String?, weight: String?) -> MFont? {
         guard let fontName = findFontName(title: name) else {
             return nil
         }
@@ -61,6 +61,10 @@ class RenderUtils {
             fontDesc = fontDesc.withSymbolicTraits(.bold)
             #endif
 
+        }
+        if style?.lowercased() == "italic",
+           let italicDesc = fontDesc.withSymbolicTraits(fontDesc.symbolicTraits.union(.traitItalic)) {
+            fontDesc = italicDesc
         }
         return MFont(descriptor: fontDesc, size: CGFloat(size))
     }
